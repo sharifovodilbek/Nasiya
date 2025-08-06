@@ -5,7 +5,7 @@ import Text from "../../components/Text"
 import { Button, Input } from "antd"
 import { LoginIcon, PasswordIcon } from "../../assets/icons"
 import { useFormik } from "formik"
-import { LoginSchema } from "../../validation/login"
+import { LoginSchema } from "../../validation/Login"
 import { useState } from "react"
 
 const login = () => {
@@ -36,7 +36,12 @@ const login = () => {
         <Link className="text-[13px] mb-[46px] text-[#3478F7] border-b-[1px] border-[#3478F7] w-[130px] ml-auto block text-end mt-[10px]" to={'#'}>Parolni unutdingizmi?</Link>
         <Button loading={isPenning} htmlType="submit" className={`w-full !h-[45px] !text-[18px] !font-medium" size="large ${isPenning ? "cursor-not-allowed" : ""}`} type="primary">Kirish</Button>
       </form>
-      <Text classList="absolute bottom-0 !font-normal !pb-[10px]">Hisobingiz yo'q bo'lsa, tizimga kirish huquqini olish uchun <span className="text-[#3478F7]">do'kon administratori</span>  bilan bog'laning.</Text>
+      <div className="mt-auto pb-2 pt-19">
+        <p className="font-normal text-sm leading-tight max-w-[350px]">
+          Hisobingiz yo'q bo'lsa, tizimga kirish huquqini olish uchun{" "}
+          <span className="text-blue-600">do'kon administratori</span> bilan bog'laning.
+        </p>
+      </div>
     </div>
   )
 }
