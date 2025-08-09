@@ -1,10 +1,12 @@
-import type { FC } from "react"
-import type { TextType } from "../@types/TextType"
+import type { FC, ReactNode } from "react";
 
-const Text:FC<TextType> = ({classList, children}) => {
-  return (
-    <p className={`${classList} font-medium text-[16px]`}>{children}</p>
-  )
-}
+type TextProps = {
+  classList?: string;
+  children: ReactNode;
+};
 
-export default Text
+const Text: FC<TextProps> = ({ classList = "", children }) => {
+  return <p className={`${classList} font-medium text-[16px]`}>{children}</p>;
+};
+
+export default Text;

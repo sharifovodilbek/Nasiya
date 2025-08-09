@@ -1,0 +1,1 @@
+export const API = import.meta.env.Vite_API

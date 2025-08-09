@@ -1,38 +1,98 @@
 @import "tailwindcss";
-.containers{
-    max-width: 400px;
-    margin: 0 auto;
-    padding: 0 16px;
+
+.containers {
+  max-width: 400px;
+  margin: 0 auto;
+  padding: 0 16px;
 }
-.page-loading-img{
-    animation-name: pageLoading;
-    animation-duration: 1s;
-    animation-iteration-count: infinite;
-    animation-direction: alternate-reverse;
-    transition: all 1s;
+.page-loading-img {
+  animation-name: pageLoading;
+  animation-duration: 1s;
+  animation-iteration-count: infinite;
+  animation-direction: alternate-reverse;
+  transition: all 1s;
 }
-.logo-icon{
-    animation-name: logo;
-    animation-duration: 1s;
-    animation-iteration-count: infinite;
-    animation-direction: alternate-reverse;
-    transition: all 1s;
+.logo-icon {
+  animation-name: logo;
+  animation-duration: 1s;
+  animation-iteration-count: infinite;
+  animation-direction: alternate-reverse;
+  transition: all 1s;
+}
+@keyframes pageLoading {
+  0% {
+    transform: scale(1) rotateY(0deg);
+  }
+  100% {
+    transform: scale(1.5) rotateY(180deg);
+  }
+}
+@keyframes logo {
+  0% {
+    transform: scale(1);
+  }
+  100% {
+    transform: scale(1.2);
+  }
+}
+.calendar-button > svg {
+  transition: all 0.3s;
+  fill: red;
+}
+.calendar-button:hover:svg {
+  transform: scale(1.2);
+}
+@media (max-height: 600px) {
+  .text-policy {
+    opacity: 0;
+  }
+}
+.avtive {
+  color: #3476f7;
+}
+.ant-picker-content > thead > tr > th {
+  padding-bottom: 10px !important;
+  text-transform: uppercase !important;
+  font-weight: 600 !important;
+  font-size: 12px !important;
+}
+.ant-picker-content > tbody > tr > .ant-picker-cell-in-view > .ant-picker-cell-inner {
+  display: flex;
+  flex-direction: column;
+  justify-content: end;
+  width: 48px !important;
+  height: 48px !important;
+  font-weight: 600 !important;
+  font-size: 13px !important;
+  background-color: #f6f6f6 !important;
+  border: 1px solid var(--Stroke-color, #ededed) !important;
+  border-radius: 8px !important;
+}
+.ant-picker-content > tbody > tr > .ant-picker-cell-selectd > .ant-picker-cell-inner {
+  color: #78a5fa !important;
+  border: 1px solid var(--Primary-Primary400, #78a5fa) !important;
+  background: var(--Primary-Primary100, #dde9fe) !important;
 }
 
-@keyframes pageLoading{
-    0%{
-        transform: scale(1) rotateY(0deg);
-    }
-    100%{
-          transform: scale(1.5) rotateY(180deg);
-    }
+.ant-picker-cell:not(.ant-picker-cell-in-view) .ant-picker-cell-inner {
+  background: transparent !important;
+  border: none !important;
+  color: transparent !important;
 }
 
-@keyframes logo{
-    0%{
-        transform: scale(1);
-    }
-    100%{
-          transform: scale(1.2);
-    }
+/* Hide built-in weekday header; we render custom UZ header */
+.ant-picker-content > thead {
+  display: none !important;
+}
+
+.ant-picker-content > thead > tr > th {
+  font-size: 12px !important;
+  color: #98a2b3 !important;
+  letter-spacing: 0.02em;
+}
+
+/* Optional subtle adjustments for calendar layout consistency */
+.ant-picker-panel {
+  border: 0 !important;
+  box-shadow: none !important;
 }
