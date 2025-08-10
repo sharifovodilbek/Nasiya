@@ -1,13 +1,13 @@
-import type { ReactNode } from "react"
+import { Outlet } from "react-router-dom"
 import { Menu } from "../modules"
 
-const DashboardLayout = ({children}:{children:ReactNode}) => {
+export default function DashboardLayout() {
   return (
     <div className="h-[100vh] relative">
-      <div className="pb-[55px]">{children}</div>
-      <Menu/>
+      <div className="pb-[76px]">
+        <Outlet />
+      </div>
+      <Menu />
     </div>
   )
 }
-
-export default DashboardLayout  

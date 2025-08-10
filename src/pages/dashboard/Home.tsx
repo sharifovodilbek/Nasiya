@@ -1,5 +1,4 @@
 "use client"
-
 import { Button } from "antd"
 import Heading from "../../components/Heading"
 import { EyeIcon, CalendarIcon, PlusIcon, WalletIcon } from "../../assets/icons"
@@ -19,6 +18,13 @@ interface DebtorStatsType {
   lateDebtors: any[]
 }
 
+interface TotalDebtResponse {
+  sellerId: string
+  thisMonthDebtorsCount: number
+  thisMonthTotalAmount: number
+  debtors: any[]
+}
+
 const Home = () => {
   const [show, setShow] = useState<boolean>(true)
   const [cookie] = useCookies(["accessToken"])
@@ -28,7 +34,9 @@ const Home = () => {
     queryKey: ["get-seller"],
     queryFn: async () => {
       try {
-        const res = await instance.get("seller/me", { headers: { Authorization: `Bearer ${cookie.accessToken}` } })
+        const res = await instance.get("seller/me", {
+          headers: { Authorization: `Bearer ${cookie.accessToken}` },
+        })
         if (res.data && res.data.data) {
           return res.data.data
         } else if (res.data) {
@@ -38,6 +46,25 @@ const Home = () => {
       } catch (err: any) {
         console.error("Seller data fetch error in queryFn:", err)
         throw new Error(err.response?.data?.message || err.message || "Failed to fetch seller data")
+      }
+    },
+    enabled: !!cookie.accessToken,
+  })
+
+  const { data: totalDebtData } = useQuery<TotalDebtResponse>({
+    queryKey: ["get-total-debt"],
+    queryFn: async () => {
+      try {
+        const res = await instance.get("seller/totalMonth", {
+          headers: { Authorization: `Bearer ${cookie.accessToken}` },
+        })
+        if (res.data) {
+          return res.data
+        }
+        throw new Error("['get-total-debt'] data is undefined or malformed")
+      } catch (err: any) {
+        console.error("Total debt fetch error in queryFn:", err)
+        throw new Error(err.response?.data?.message || err.message || "Failed to fetch total debt data")
       }
     },
     enabled: !!cookie.accessToken,
@@ -65,7 +92,8 @@ const Home = () => {
   const data = {
     name: sellerData?.name,
     img: sellerData?.img,
-    totalDebt: sellerData?.totalDebt,
+    totalDebt: totalDebtData?.thisMonthTotalAmount || 0,
+    thisMonthDebtorsCount: totalDebtData?.thisMonthDebtorsCount || 0,
     wallet: sellerData?.wallet || "0",
     lateDebtors: debtorStatsData?.lateDebtors || [],
     lateDebtorsCount: debtorStatsData?.lateDebtorsCount || 0,
@@ -117,19 +145,23 @@ const Home = () => {
         <Heading tag="h3" classList="!text-[#F6F6F6B2]">
           Umumiy nasiya:
         </Heading>
-        <button className="absolute right-[20px] top-[37px] cursor-pointer" onClick={() => setShow(!show)}>
+        <button
+          className="absolute right-[20px] top-[37px] cursor-pointer"
+          onClick={() => setShow(!show)}
+        >
           <EyeIcon />
         </button>
       </div>
 
+
       <div className="flex gap-[8px] mt-[31px]">
-        <div className="p-[16px] rounded-[16px] border-[1px] border-[#ECECEC] w-full h-[127px] pr-[30px] flex flex-col justify-between">
+        <div className="p-[16px] rounded-[16px] border-[1px] border-[#] w-full h-[127px] pr-[30px] flex flex-col justify-between">
           <Heading tag="h3">Kechiktirilgan to‘lovlar</Heading>
           <Heading tag="h2" classList="!text-[18px] !text-[#F94D4D]">
             {(data?.lateDebtors as any)?.length || 0}
           </Heading>
         </div>
-        <div className="p-[16px] rounded-[16px] border-[1px] border-[#ECECEC] w-full h-[127px] pr-[30px] flex flex-col justify-between">
+        <div className="p-[16px] rounded-[16px] border-[1px] border-[#7d7d7d] w-full h-[127px] pr-[30px] flex flex-col justify-between">
           <Heading tag="h3">Mijozlar soni</Heading>
           <Heading tag="h2" classList="!text-[18px] !text-[#30AF49]">
             {data?.lateDebtorsCount || 0}
@@ -166,4 +198,5 @@ const Home = () => {
     </div>
   )
 }
+
 export default Home

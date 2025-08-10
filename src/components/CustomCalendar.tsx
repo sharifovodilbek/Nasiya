@@ -8,7 +8,7 @@ import { FindMonth } from "../hooks/FindMonth"
 import { FormatNumber } from "../hooks/FormatNumber"
 import { ChevronLeft, ChevronRight } from "lucide-react"
 import type { Dispatch, SetStateAction } from "react"
-import type { CalenderUniqForDayType } from "../@types/CalendarDebt"
+import type { UnpaidDayType } from "../@types/CalendarDebt"
 
 dayjs.locale("uz")
 
@@ -16,7 +16,7 @@ type Props = {
   totalForMonth: number | string
   setNowDate: Dispatch<SetStateAction<dayjs.Dayjs | undefined>>
   newDate: dayjs.Dayjs | undefined
-  unpaidForDay?: Array<CalenderUniqForDayType>
+  unpaidForDay?: UnpaidDayType[]
 }
 
 type DayCell = {
@@ -25,7 +25,7 @@ type DayCell = {
   date?: dayjs.Dayjs
 }
 
-const WEEKDAYS = ["DU", "SE", "CH", "PA", "JU", "SH", "YA"] 
+const WEEKDAYS = ["DU", "SE", "CH", "PA", "JU", "SH", "YA"]
 
 const toMonFirstIndex = (jsDay: number) => (jsDay + 6) % 7
 
@@ -35,7 +35,7 @@ export default function CustomCalendar({ newDate, setNowDate, totalForMonth, unp
   const endOfMonth = current.endOf("month")
   const daysInMonth = endOfMonth.date()
 
-  const startCol = toMonFirstIndex(startOfMonth.day()) 
+  const startCol = toMonFirstIndex(startOfMonth.day())
 
   const cells: DayCell[] = []
   for (let i = 0; i < startCol; i++) {
@@ -51,14 +51,12 @@ export default function CustomCalendar({ newDate, setNowDate, totalForMonth, unp
 
   const itemsByDay = unpaidForDay.reduce((map, item) => {
     const k = dayjs(item.date).format("YYYY-MM-DD")
-    const arr = map.get(k) || []
-    arr.push(item)
-    map.set(k, arr)
+    map.set(k, item)
     return map
-  }, new Map<string, CalenderUniqForDayType[]>())
+  }, new Map<string, UnpaidDayType>())
 
   const selectedKey = current.format("YYYY-MM-DD")
-  const selectedList = itemsByDay.get(selectedKey) || []
+  const selectedList = itemsByDay.get(selectedKey)?.debts || []
 
   function changeMonth(dir: "prev" | "next") {
     const next = dir === "next" ? current.add(1, "month") : current.subtract(1, "month")
@@ -140,15 +138,21 @@ export default function CustomCalendar({ newDate, setNowDate, totalForMonth, unp
 
       <div className="space-y-[10px]">
         {selectedList.length > 0 ? (
-          selectedList.map((item) => (
-            <div
-              key={item.id}
-              className="p-[12px] rounded-[12px] bg-white text-[#111827] flex flex-col gap-[4px] shadow-[0_1px_0_rgba(0,0,0,0.04)] border border-[#ECECEC]"
-            >
-              <p className="text-[14px] font-medium">{item.Debt?.Debtor?.fullname || "Mijoz"}</p>
-              <p className="text-[12px] text-[#667085]">UZS {FormatNumber(item.amount || 0)}</p>
-            </div>
-          ))
+          selectedList.map((item) => {
+            console.log("Qarz item:", item)
+
+            const totalAmount = item.paymentHistory?.reduce((sum, pay) => sum + pay.amount, 0) || 0
+
+            return (
+              <div
+                key={item.id}
+                className="p-[12px] rounded-[12px] bg-white text-[#111827] flex flex-col gap-[4px] shadow-[0_1px_0_rgba(0,0,0,0.04)] border border-[#ECECEC]"
+              >
+                <p className="text-[14px] font-medium">{item.Debtor?.fullname || "John Doe"}</p>
+                <p className="text-[12px] text-[#667085]">UZS {FormatNumber(totalAmount)}</p>
+              </div>
+            )
+          })
         ) : (
           <div className="text-[12px] text-[#98A2B3]">Bu kunda to‘lov kutilmaydi</div>
         )}

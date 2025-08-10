@@ -8,13 +8,8 @@ import { useNavigate } from "react-router-dom"
 import CustomCalendar from "../../components/CustomCalendar"
 import { instance } from "../../hooks/instance"
 import { ArrowLeft } from "lucide-react"
-import type { CalenderUniqForDayType } from "../../@types/CalendarDebt"
+import type { CalendarType, DebtItemType } from "../../@types/CalendarDebt"
 import { PATH } from "../../hooks/Path"
-
-type CalendarQuery = {
-  unpaidForDay: CalenderUniqForDayType[]
-  totalForMonths: number
-}
 
 const CalendarPage = () => {
   const [cookies] = useCookies(["accessToken"])
@@ -26,17 +21,83 @@ const CalendarPage = () => {
     else navigate(PATH.main)
   }, [navigate])
 
-  const { data } = useQuery<CalendarQuery>({
+  const { data } = useQuery<CalendarType>({
     queryKey: ["calendar-data", nowDate?.format("YYYY-MM")],
     queryFn: async () => {
-      const month = nowDate?.format("YYYY-MM")
-      const res = await instance.get(`debt/startDate?month=${month}`, {
+      if (!nowDate) return { unpaidForDay: [], totalForMonths: 0 }
+
+      const currentMonth = nowDate.startOf("month") 
+      const nextMonth = currentMonth.add(1, "month") 
+
+      const res = await instance.get(`debt`, {
         headers: { Authorization: `Bearer ${cookies.accessToken}` },
       })
-      return res.data?.data ?? res.data
+
+      const debts: DebtItemType[] = res.data.data || []
+
+      function getTermMonths(term: number | string): number {
+        if (typeof term === "number") {
+          return term;
+        }
+        const match = term.match(/(\d+)/);
+        return match ? parseInt(match[1], 10) : 0;
+      }
+
+      const filtered = debts.filter((item) => {
+        const start = dayjs(item.startDate)
+        const termMonths = getTermMonths(item.term)
+        const end = start.add(termMonths, "month")
+
+        return end.isAfter(currentMonth) && start.isBefore(nextMonth.endOf("month"))
+      })
+
+      const unpaidForDay = Object.values(
+        filtered.reduce((acc: Record<string, any>, item) => {
+          const startDate = dayjs(item.startDate);
+          const termMonths = getTermMonths(item.term);
+          let paymentDate: string | null = null;
+
+          for (let i = 0; i < termMonths; i++) {
+            const possibleDate = startDate.add(i, "month").format("YYYY-MM-DD");
+            if (possibleDate.startsWith(currentMonth.format("YYYY-MM"))) {
+              paymentDate = possibleDate;
+              break;
+            }
+          }
+
+          if (!paymentDate) {
+            return acc;
+          }
+
+          if (!acc[paymentDate]) {
+            acc[paymentDate] = {
+              date: paymentDate,
+              debts: [],
+              total: 0,
+            };
+          }
+
+          acc[paymentDate].debts.push(item);
+          acc[paymentDate].total += (item.paymentHistory || []).reduce(
+            (sum, pay) => sum + pay.amount,
+            0
+          );
+
+          return acc;
+        }, {})
+      );
+
+
+      const totalForMonths = unpaidForDay.reduce(
+        (sum: number, day: any) => sum + day.total,
+        0
+      )
+
+      return { unpaidForDay, totalForMonths }
     },
     enabled: !!cookies.accessToken && !!nowDate,
   })
+
 
   return (
     <div className="containers pt-[10px] pb-[80px]">
