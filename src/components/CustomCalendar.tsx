@@ -132,7 +132,7 @@ export default function CustomCalendar({ newDate, setNowDate, totalForMonth, unp
 
       <div className="mt-[14px] rounded-[16px] bg-[#F6F6F6] px-[12px] py-[10px] mb-[10px]">
         <p className="text-[12px] font-semibold text-[#111827]">
-          {current.date()} {FindMonth(current.month())} kuni to‘lov kutilmoqda
+          {current.date()} {FindMonth(current.month())} kuni to‘lov qiluvchilar ro'yxati:
         </p>
       </div>
 

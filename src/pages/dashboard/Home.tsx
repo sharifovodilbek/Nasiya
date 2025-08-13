@@ -93,7 +93,7 @@ const Home = () => {
     name: sellerData?.name,
     img: sellerData?.img,
     totalDebt: totalDebtData?.thisMonthTotalAmount || 0,
-    thisMonthDebtorsCount: totalDebtData?.thisMonthDebtorsCount || 0,
+    thisMonthDebtorsCount: totalDebtData?.thisMonthDebtorsCount || 0, // bu mijozlar soni
     wallet: sellerData?.wallet || "0",
     lateDebtors: debtorStatsData?.lateDebtors || [],
     lateDebtorsCount: debtorStatsData?.lateDebtorsCount || 0,
@@ -164,9 +164,10 @@ const Home = () => {
         <div className="p-[16px] rounded-[16px] border-[1px] border-[#7d7d7d] w-full h-[127px] pr-[30px] flex flex-col justify-between">
           <Heading tag="h3">Mijozlar soni</Heading>
           <Heading tag="h2" classList="!text-[18px] !text-[#30AF49]">
-            {data?.lateDebtorsCount || 0}
+            {data?.thisMonthDebtorsCount || 0}
           </Heading>
         </div>
+
       </div>
 
       <div className="mt-[40px]">
